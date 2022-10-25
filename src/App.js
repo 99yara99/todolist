@@ -13,8 +13,14 @@ import {
 
 function App() {
   const [inputText, setInputText] = useState('');
+  const [modalIsOpen, setIsOpen] = useState(false);
+  const [editNote, setEditNote] = useState(null);
   const handleChange = (event) => setInputText(event.target.value);
+  const note = useSelector((state) => state.todos);
+
   const dispatch = useDispatch();
+
+  // ADDNOTE
 
   const addNote = (event) => {
     event.preventDefault();
@@ -24,13 +30,18 @@ function App() {
     setInputText('');
   };
 
-  const note = useSelector((state) => state.todos);
-
-  const [modalIsOpen, setIsOpen] = useState(false);
-  const [inputTextModal, setInputTextModal] = useState('');
-  const handleChangeModal = (event) => setInputTextModal(event.target.value);
+  // DELETENOTE
 
   const deleteNote = (id) => dispatch(deleteNoteAction(id));
+
+  // UPDATENOTE
+
+  const handleChangeModal = (event) => {
+    setEditNote({
+      ...editNote,
+      text: event.target.value,
+    });
+  };
 
   function openModal() {
     setIsOpen(true);
@@ -39,10 +50,17 @@ function App() {
   function closeModal() {
     setIsOpen(false);
   }
-  const updateNote = (event, id) => {
+
+  const updateNote = (note) => {
+    setEditNote(note);
+    openModal();
+  };
+
+  const onEditNote = (event) => {
     event.preventDefault();
-    dispatch(updateNoteAction(id, inputTextModal));
+    dispatch(updateNoteAction(editNote));
     closeModal();
+    // setEditNote(null);
   };
 
   let listOfNotes = note.map((note) => (
@@ -55,30 +73,34 @@ function App() {
       >
         x
       </button>
-      <button className="updateButton" type="button" onClick={openModal}>
+      <button
+        className="updateButton"
+        type="button"
+        onClick={() => updateNote(note)}
+      >
         Редагувати
       </button>
-
-      <Modal isOpen={modalIsOpen} onRequestClose={closeModal}>
-        <form
-          id="todoFormModal"
-          onSubmit={(event) => updateNote(event, note.id)}
-        >
-          <input
-            type="text"
-            placeholder={note.text}
-            value={inputTextModal}
-            onChange={handleChangeModal}
-          />
-          <button type="submit">Редагувати</button>
-        </form>
-      </Modal>
     </li>
   ));
 
   return (
     <>
       <h1>My todolist</h1>
+      <Modal
+        isOpen={modalIsOpen}
+        onRequestClose={closeModal}
+        ariaHideApp={false}
+      >
+        <form id="todoFormModal" onSubmit={onEditNote}>
+          <input
+            type="text"
+            value={editNote?.text}
+            onChange={handleChangeModal}
+          />
+          <button type="submit">Редагувати</button>
+        </form>
+      </Modal>
+
       <Form
         inputText={inputText}
         addNote={addNote}
