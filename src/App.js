@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import Modal from 'react-modal';
 import './App.css';
+import './Modal.css';
 import Form from './components/Form/Form';
 import List from './components/List/List';
 import {
@@ -90,8 +91,9 @@ function App() {
         isOpen={modalIsOpen}
         onRequestClose={closeModal}
         ariaHideApp={false}
+        className="modalWindow"
       >
-        <form id="todoFormModal" onSubmit={onEditNote}>
+        <form className="todoFormModal" onSubmit={onEditNote}>
           <input
             type="text"
             value={editNote?.text}
